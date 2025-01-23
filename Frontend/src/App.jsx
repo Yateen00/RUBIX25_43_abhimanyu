@@ -1,5 +1,5 @@
+import { Heatmap } from "./heatmaps";
 import HomePage from "./home";
-import Map from "./map";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
@@ -8,7 +8,7 @@ function App() {
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<HomePage />}></Route>
-                    <Route path="/map" element={<Map />}></Route>
+                    <Route path="/map" element={<Heatmap />}></Route>
                 </Routes>
             </BrowserRouter>
         </>

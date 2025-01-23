@@ -1,8 +1,10 @@
 import React from 'react';
+import {useNavigate} from 'react-router-dom';
 import { Globe, Calendar, User, Thermometer, Activity, BarChart } from 'lucide-react';
 import 'tailwindcss/tailwind.css';
 
 const HomePage = () => {
+  const navigate = useNavigate();
   return (
     <div className="relative bg-gray-900 text-white min-h-screen font-sans overflow-auto">
       {/* Background Video */}
@@ -25,7 +27,12 @@ const HomePage = () => {
             Leveraging Time Series Analysis with Prophet FB
           </p>
         </div>
+        <br />
+        <button onClick={()=> navigate("/map")} className='bg-black mt-4 p-2 rounded-lg px-4 text-white font-semibold text-lg'>
+          Get Started
+        </button>
       </header>
+
 
       <main className="px-6 md:px-16 lg:px-32 relative z-10">
         <section className="mb-12">

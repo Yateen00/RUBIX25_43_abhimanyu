@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { scaleQuantile } from "d3-scale";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import INDIA_TOPO_JSON from "./india.topo.json";
+import CASES from "./cases.json";
 
 const PROJECTION_CONFIG = {
     scale: 1200,
@@ -23,10 +24,6 @@ const COLOR_RANGE = [
 
 const DEFAULT_COLOR = "#EEE";
 
-const getRandomInt = (min = 0, max = 100) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-
 const geographyStyle = {
     default: {
         outline: "none",
@@ -41,56 +38,70 @@ const geographyStyle = {
     },
 };
 
-const initialHeatMapData = [
-    { id: "AP", state: "Andhra Pradesh", value: getRandomInt() },
-    { id: "AR", state: "Arunachal Pradesh", value: getRandomInt() },
-    { id: "AS", state: "Assam", value: getRandomInt() },
-    { id: "BR", state: "Bihar", value: getRandomInt() },
-    { id: "CT", state: "Chhattisgarh", value: getRandomInt() },
-    { id: "GA", state: "Goa", value: 21 },
-    { id: "GJ", state: "Gujarat", value: 22 },
-    { id: "HR", state: "Haryana", value: getRandomInt() },
-    { id: "HP", state: "Himachal Pradesh", value: 24 },
-    { id: "JH", state: "Jharkhand", value: 26 },
-    { id: "KA", state: "Karnataka", value: 27 },
-    { id: "KL", state: "Kerala", value: getRandomInt() },
-    { id: "MP", state: "Madhya Pradesh", value: getRandomInt() },
-    { id: "MH", state: "Maharashtra", value: getRandomInt() },
-    { id: "MN", state: "Manipur", value: getRandomInt() },
-    { id: "ML", state: "Meghalaya", value: 59 },
-    { id: "MZ", state: "Mizoram", value: getRandomInt() },
-    { id: "NL", state: "Nagaland", value: 59 },
-    { id: "OR", state: "Odisha", value: 59 },
-    { id: "PB", state: "Punjab", value: getRandomInt() },
-    { id: "RJ", state: "Rajasthan", value: getRandomInt() },
-    { id: "SK", state: "Sikkim", value: getRandomInt() },
-    { id: "TN", state: "Tamil Nadu", value: getRandomInt() },
-    { id: "TG", state: "Telangana", value: getRandomInt() },
-    { id: "TR", state: "Tripura", value: 14 },
-    { id: "UT", state: "Uttarakhand", value: getRandomInt() },
-    { id: "UP", state: "Uttar Pradesh", value: 15 },
-    { id: "WB", state: "West Bengal", value: 17 },
-    { id: "AN", state: "Andaman and Nicobar Islands", value: getRandomInt() },
-    { id: "CH", state: "Chandigarh", value: getRandomInt() },
-    { id: "DN", state: "Dadra and Nagar Haveli", value: 19 },
-    { id: "DD", state: "Daman and Diu", value: 20 },
-    { id: "DL", state: "Delhi", value: 59 },
-    { id: "JK", state: "Jammu and Kashmir", value: 25 },
-    { id: "LA", state: "Ladakh", value: getRandomInt() },
-    { id: "LD", state: "Lakshadweep", value: getRandomInt() },
-    { id: "PY", state: "Puducherry", value: getRandomInt() },
-];
+// Mapping state names to IDs
+const STATE_ID_MAP = {
+    "Andaman and Nicobar Islands": "AN",
+    "Andhra Pradesh": "AP",
+    "Arunachal Pradesh": "AR",
+    Assam: "AS",
+    Bihar: "BR",
+    Chhattisgarh: "CT",
+    Goa: "GA",
+    Gujarat: "GJ",
+    Haryana: "HR",
+    "Himachal Pradesh": "HP",
+    Jharkhand: "JH",
+    Karnataka: "KA",
+    Kerala: "KL",
+    "Madhya Pradesh": "MP",
+    Maharashtra: "MH",
+    Manipur: "MN",
+    Meghalaya: "ML",
+    Mizoram: "MZ",
+    Nagaland: "NL",
+    Odisha: "OD",
+    Punjab: "PB",
+    Rajasthan: "RJ",
+    Sikkim: "SK",
+    "Tamil Nadu": "TN",
+    Telangana: "TS",
+    Tripura: "TR",
+    Uttarakhand: "UK",
+    "Uttar Pradesh": "UP",
+    "West Bengal": "WB",
+    "Jammu and Kashmir": "JK",
+    Ladakh: "LA",
+    Lakshadweep: "LD",
+    Puducherry: "PY",
+    Chandigarh: "CH",
+    "Dadra and Nagar Haveli": "DN",
+    "Daman and Diu": "DD",
+    Delhi: "DL",
+};
 
-function Map() {
+function MapSingle() {
     const [tooltipContent, setTooltipContent] = useState("");
-    const [data] = useState(initialHeatMapData);
+    const [data, setData] = useState([]);
     const [hoveredState, setHoveredState] = useState(null);
+
+    useEffect(() => {
+        const heatmapData = Object.keys(CASES).map((stateName) => {
+            const stateData = CASES[stateName];
+            const latestValue = stateData.past[stateData.past.length - 1][1]; // Get the most recent value
+            return {
+                id: STATE_ID_MAP[stateName], // Get the state ID
+                state: stateName,
+                value: latestValue,
+            };
+        });
+        setData(heatmapData);
+    }, []);
 
     const gradientData = {
         fromColor: COLOR_RANGE[0],
         toColor: COLOR_RANGE[COLOR_RANGE.length - 1],
         min: 0,
-        max: Math.max(...data.map((item) => item.value)),
+        max: Math.max(...data.map((item) => item.value || 0)),
     };
 
     const colorScale = scaleQuantile()
@@ -99,7 +110,7 @@ function Map() {
 
     return (
         <div className="flex flex-col items-center justify-center w-full h-screen px-4">
-            <h1 className="text-2xl font-semibold mb-4 mt-4">Cases according to States</h1>
+            <h1 className="text-2xl font-semibold mb-4 mt-4 text-center text-white">Cases according to States for a single day </h1>
             <ReactTooltip>{tooltipContent}</ReactTooltip>
             <ComposableMap
                 projectionConfig={PROJECTION_CONFIG}
@@ -137,17 +148,17 @@ function Map() {
                 </div>
             )}
             <div className="flex items-center gap-4 mt-6 mb-4">
-                <span className="text-sm">Low</span>
+                <span className="text-sm text-white">Low</span>
                 <div
                     className="h-5 w-72 rounded border"
                     style={{
                         background: `linear-gradient(to right, ${gradientData.fromColor}, ${gradientData.toColor})`,
                     }}
                 ></div>
-                <span className="text-sm">High</span>
+                <span className="text-sm text-white">High</span>
             </div>
         </div>
     );
 }
 
-export default Map;
+export default MapSingle;
