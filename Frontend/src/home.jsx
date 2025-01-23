@@ -1,5 +1,5 @@
 import React from 'react';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Globe, Calendar, User, Thermometer, Activity, BarChart } from 'lucide-react';
 import 'tailwindcss/tailwind.css';
 
@@ -28,9 +28,7 @@ const HomePage = () => {
           </p>
         </div>
         <br />
-        <button onClick={()=> navigate("/map")} className='bg-black mt-4 p-2 rounded-lg px-4 text-white font-semibold text-lg'>
-          Get Started
-        </button>
+
       </header>
 
 
@@ -44,6 +42,17 @@ const HomePage = () => {
             <p className="mt-4 text-gray-200 leading-relaxed text-lg md:text-xl">
               Airborne diseases follow seasonal patterns often seen during colder months of the year. Prophet FB helps us analyze these trends and prevent major future outbreaks. Changes in environmental conditions, such as temperature and humidity, can also be factored in, allowing for real-time updates and forecastability.
             </p>
+          </div>
+          <div className='flex justify-center gap-4'>
+            <button onClick={() => navigate("/map")} className='bg-black mt-4 p-4 rounded-lg px-6 text-white font-semibold text-xl'>
+              Show Heatmaps
+            </button>
+            <button onClick={() => navigate("/charts")} className='bg-black mt-4 p-4 rounded-lg px-6 text-white font-semibold text-xl'>
+              Compare Statewise
+            </button>
+            <button onClick={() => navigate("/predict")} className='bg-black mt-4 p-4 rounded-lg px-6 text-white font-semibold text-xl'>
+              Predict Cases
+            </button>
           </div>
         </section>
 
@@ -67,22 +76,22 @@ const HomePage = () => {
         </section>
 
         {[
-          { 
-            icon: Thermometer, 
-            color: 'red-500', 
-            title: 'Environmental Dynamics', 
+          {
+            icon: Thermometer,
+            color: 'red-500',
+            title: 'Environmental Dynamics',
             description: 'Temperature Spectrum: Average, minimum, and maximum temperature gradients, precipitation patterns, and atmospheric humidity metrics.'
           },
-          { 
-            icon: Activity, 
-            color: 'yellow-500', 
-            title: 'Mobility and Social Interaction', 
+          {
+            icon: Activity,
+            color: 'yellow-500',
+            title: 'Mobility and Social Interaction',
             description: 'Movement Tracking: Retail, recreational, workplace, and residential mobility patterns, along with public space utilization.'
           },
-          { 
-            icon: BarChart, 
-            color: 'teal-500', 
-            title: 'Epidemiological Indicators', 
+          {
+            icon: BarChart,
+            color: 'teal-500',
+            title: 'Epidemiological Indicators',
             description: 'Daily Transmission Metrics: New confirmed cases, mortality and recovery rates, and testing distribution.'
           }
         ].map(({ icon: Icon, color, title, description }, index) => (
