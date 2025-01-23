@@ -53,6 +53,9 @@ const HomePage = () => {
             <button onClick={() => navigate("/predict")} className='bg-black mt-4 p-4 rounded-lg px-6 text-white font-semibold text-xl'>
               Predict Cases
             </button>
+            <button onClick={() => navigate("/csv")} className='bg-black mt-4 p-4 rounded-lg px-6 text-white font-semibold text-xl'>
+              Upload Dataset
+            </button>
           </div>
         </section>
 
