@@ -38,7 +38,6 @@ const geographyStyle = {
     },
 };
 
-// Mapping state names to IDs
 const STATE_ID_MAP = {
     "Andaman and Nicobar Islands": "AN",
     "Andhra Pradesh": "AP",
@@ -83,33 +82,33 @@ function MapSingle() {
     const [tooltipContent, setTooltipContent] = useState("");
     const [data, setData] = useState([]);
     const [hoveredState, setHoveredState] = useState(null);
-    const [selectedDate, setSelectedDate] = useState(""); // New state for selected date
-    const [filteredData, setFilteredData] = useState([]); // State to store filtered data for the selected date
+    const [selectedDate, setSelectedDate] = useState(""); 
+    const [filteredData, setFilteredData] = useState([]); 
 
     useEffect(() => {
-        // Filter the cases based on the selected date
+       
         if (selectedDate) {
             const heatmapData = Object.keys(CASES).map((stateName) => {
                 const stateData = CASES[stateName];
-                // Check for the past data and find the corresponding value for the selected date
+                
                 const pastData = stateData.past.find(([date]) => date === selectedDate);
                 const predictionData = stateData.prediction.find(([date]) => date === selectedDate);
     
                 let value = null;
                 if (pastData) {
-                    value = pastData[1]; // Using past data
+                    value = pastData[1]; 
                 } else if (predictionData) {
-                    value = predictionData[1]; // Using predicted data
+                    value = predictionData[1]; 
                 }
     
                 return value
                     ? {
                           id: STATE_ID_MAP[stateName],
                           state: stateName,
-                          value: Math.round(value), // Round the value to remove decimals
+                          value: Math.round(value), 
                       }
                     : null;
-            }).filter(Boolean); // Remove null entries
+            }).filter(Boolean); 
     
             setFilteredData(heatmapData);
         }

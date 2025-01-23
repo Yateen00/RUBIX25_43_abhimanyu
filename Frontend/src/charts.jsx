@@ -32,7 +32,7 @@ const Charts = ({ casesData }) => {
                     borderColor: `hsl(${Math.random() * 360}, 70%, 50%)`,
                     fill: false,
                     tension: 0.3,
-                    borderWidth: 2, // increased border width for better visibility
+                    borderWidth: 2,
                 };
             });
 
@@ -48,16 +48,15 @@ const Charts = ({ casesData }) => {
     return (
         <div className="flex flex-col items-center justify-center w-full min-h-screen px-4 py-8 bg-black text-white overflow-auto">
             <h1 className="text-3xl font-bold mb-6 text-center">Compare Cases by State</h1>
-            
+
             <div className="flex flex-wrap gap-4 justify-center mb-6">
                 {allStates.map((state) => (
                     <button
                         key={state}
-                        className={`px-6 py-3 rounded-full font-medium shadow-md transform transition-transform duration-300 hover:scale-105 ${
-                            selectedStates.includes(state)
+                        className={`px-6 py-3 rounded-full font-medium shadow-md transform transition-transform duration-300 hover:scale-105 ${selectedStates.includes(state)
                                 ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
                                 : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                        }`}
+                            }`}
                         onClick={() => handleStateSelection(state)}
                     >
                         {state}
@@ -67,7 +66,7 @@ const Charts = ({ casesData }) => {
 
             {chartData.labels && (
                 <div className="w-full lg:w-3/4 xl:w-2/3 2xl:w-1/2 bg-gray-900 p-6 rounded-lg shadow-lg mb-8">
-                    {/* This ensures the chart div has a max-width for better responsiveness */}
+
                     <Line
                         data={chartData}
                         options={{

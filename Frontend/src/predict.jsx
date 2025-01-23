@@ -4,9 +4,9 @@ const PredictCases = ({ casesData }) => {
     const [inputDate, setInputDate] = useState("");
     const [predictedCases, setPredictedCases] = useState(null);
     const [error, setError] = useState("");
-    const [stateName, setStateName] = useState("Andaman and Nicobar Islands"); // default state
+    const [stateName, setStateName] = useState("Andaman and Nicobar Islands");
 
-    const stateNames = Object.keys(casesData || {}); // Get the list of available states
+    const stateNames = Object.keys(casesData || {});
 
     const handleDateChange = (e) => {
         setInputDate(e.target.value);
@@ -21,7 +21,6 @@ const PredictCases = ({ casesData }) => {
             const stateData = casesData[stateName];
             const predictedData = stateData.prediction;
 
-            // Find predicted data for the selected date
             const dateData = predictedData.find(([date]) => date === inputDate);
             if (dateData) {
                 setPredictedCases(dateData[1]);

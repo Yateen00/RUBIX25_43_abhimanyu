@@ -7,19 +7,19 @@ import PredictCases from "./predict";
 import CsvUploadPage from "./csv";
 
 function App() {
-  return (
-    <>
+    return (
+        <>
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<HomePage />}></Route>
                     <Route path="/map" element={<Heatmap />}></Route>
-                    <Route path="/charts" element={<Charts casesData={CASES}/>}></Route>
-                    <Route path="/predict" element={<PredictCases casesData={CASES}/>}></Route>
-                    <Route path="/csv" element={<CsvUploadPage/>}></Route>
+                    <Route path="/charts" element={<Charts casesData={CASES} />}></Route>
+                    <Route path="/predict" element={<PredictCases casesData={CASES} />}></Route>
+                    <Route path="/csv" element={<CsvUploadPage />}></Route>
                 </Routes>
             </BrowserRouter>
         </>
-  )
+    )
 }
 
 

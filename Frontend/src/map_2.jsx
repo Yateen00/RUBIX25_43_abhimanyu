@@ -87,16 +87,16 @@ function MapSeven() {
     useEffect(() => {
         const heatmapData = Object.keys(CASES).map((stateName) => {
             const stateData = CASES[stateName];
-            const latestValue = stateData.past[stateData.past.length - 1][1]; // Get the most recent value
+            const latestValue = stateData.past[stateData.past.length - 1][1]; 
 
-            // Extract the last 7 days' cases and dates
+            
             const last7Days = stateData.past.slice(-7).map(([date, value]) => ({ date, value }));
 
             return {
-                id: STATE_ID_MAP[stateName], // Get the state ID
+                id: STATE_ID_MAP[stateName], 
                 state: stateName,
                 value: latestValue,
-                last7Days, // Include last 7 days' data
+                last7Days, 
             };
         });
         setData(heatmapData);
