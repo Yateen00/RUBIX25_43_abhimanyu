@@ -83,34 +83,68 @@ function MapSingle() {
     const [tooltipContent, setTooltipContent] = useState("");
     const [data, setData] = useState([]);
     const [hoveredState, setHoveredState] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(""); // New state for selected date
+    const [filteredData, setFilteredData] = useState([]); // State to store filtered data for the selected date
 
     useEffect(() => {
-        const heatmapData = Object.keys(CASES).map((stateName) => {
-            const stateData = CASES[stateName];
-            const latestValue = stateData.past[stateData.past.length - 1][1]; // Get the most recent value
-            return {
-                id: STATE_ID_MAP[stateName], // Get the state ID
-                state: stateName,
-                value: latestValue,
-            };
-        });
-        setData(heatmapData);
-    }, []);
+        // Filter the cases based on the selected date
+        if (selectedDate) {
+            const heatmapData = Object.keys(CASES).map((stateName) => {
+                const stateData = CASES[stateName];
+                // Check for the past data and find the corresponding value for the selected date
+                const pastData = stateData.past.find(([date]) => date === selectedDate);
+                const predictionData = stateData.prediction.find(([date]) => date === selectedDate);
+    
+                let value = null;
+                if (pastData) {
+                    value = pastData[1]; // Using past data
+                } else if (predictionData) {
+                    value = predictionData[1]; // Using predicted data
+                }
+    
+                return value
+                    ? {
+                          id: STATE_ID_MAP[stateName],
+                          state: stateName,
+                          value: Math.round(value), // Round the value to remove decimals
+                      }
+                    : null;
+            }).filter(Boolean); // Remove null entries
+    
+            setFilteredData(heatmapData);
+        }
+    }, [selectedDate]);
+    
 
     const gradientData = {
         fromColor: COLOR_RANGE[0],
         toColor: COLOR_RANGE[COLOR_RANGE.length - 1],
         min: 0,
-        max: Math.max(...data.map((item) => item.value || 0)),
+        max: Math.max(...filteredData.map((item) => item.value || 0)),
     };
 
     const colorScale = scaleQuantile()
-        .domain(data.map((d) => d.value))
+        .domain(filteredData.map((d) => d.value))
         .range(COLOR_RANGE);
+
+    const handleDateChange = (e) => {
+        setSelectedDate(e.target.value);
+    };
 
     return (
         <div className="flex flex-col items-center justify-center w-full h-screen px-4">
-            <h1 className="text-2xl font-semibold mb-4 mt-4 text-center text-white">Cases according to States for a single day </h1>
+            <h1 className="text-2xl font-semibold mb-4 mt-4 text-center text-white">Cases by State upto a date</h1>
+            <div className="flex flex-col items-center mb-6">
+                <label htmlFor="date" className="text-white mb-2">Select a Date:</label>
+                <input
+                    type="date"
+                    id="date"
+                    value={selectedDate}
+                    onChange={handleDateChange}
+                    className="px-4 py-2 rounded-md text-black"
+                />
+            </div>
+
             <ReactTooltip>{tooltipContent}</ReactTooltip>
             <ComposableMap
                 projectionConfig={PROJECTION_CONFIG}
@@ -122,7 +156,7 @@ function MapSingle() {
                 <Geographies geography={INDIA_TOPO_JSON}>
                     {({ geographies }) =>
                         geographies.map((geo) => {
-                            const current = data.find((s) => s.id === geo.id);
+                            const current = filteredData.find((s) => s.id === geo.id);
                             return (
                                 <Geography
                                     key={geo.rsmKey}
@@ -147,6 +181,11 @@ function MapSingle() {
                     Value: {hoveredState.value}
                 </div>
             )}
+
+            {filteredData.length === 0 && (
+                <div className="text-white mt-4">No data available for the selected date.</div>
+            )}
+
             <div className="flex items-center gap-4 mt-6 mb-4">
                 <span className="text-sm text-white">Low</span>
                 <div
