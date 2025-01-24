@@ -11,18 +11,19 @@ const PROJECTION_CONFIG = {
 };
 
 const COLOR_RANGE = [
-    "#ffedea",
-    "#ffcec5",
-    "#ffad9f",
-    "#ff8a75",
-    "#ff5533",
-    "#e2492d",
-    "#be3d26",
-    "#9a311f",
-    "#782618",
+    "#e8f5e9", // Light green
+    "#c8e6c9",
+    "#a5d6a7",
+    "#81c784",
+    "#66bb6a", // Medium green
+    "#4caf50",
+    "#43a047",
+    "#388e3c", // Darker green
+    "#2e7d32",
 ];
 
 const DEFAULT_COLOR = "#EEE";
+const HOTSPOT_COLOR = "#ff5722"; // Hotspot color (e.g., bright red)
 
 const geographyStyle = {
     default: {
@@ -78,42 +79,37 @@ const STATE_ID_MAP = {
     Delhi: "DL",
 };
 
-function MapSingle() {
+function MapSingle({selectedDate}) {
     const [tooltipContent, setTooltipContent] = useState("");
     const [data, setData] = useState([]);
     const [hoveredState, setHoveredState] = useState(null);
-    const [selectedDate, setSelectedDate] = useState(""); 
-    const [filteredData, setFilteredData] = useState([]); 
+    const [filteredData, setFilteredData] = useState([]);
 
     useEffect(() => {
-       
         if (selectedDate) {
             const heatmapData = Object.keys(CASES).map((stateName) => {
                 const stateData = CASES[stateName];
-                
+
                 const pastData = stateData.past.find(([date]) => date === selectedDate);
                 const predictionData = stateData.prediction.find(([date]) => date === selectedDate);
-    
+
                 let value = null;
                 if (pastData) {
-                    value = pastData[1]; 
+                    value = pastData[1];
                 } else if (predictionData) {
-                    value = predictionData[1]; 
+                    value = predictionData[1];
                 }
-    
-                return value
-                    ? {
-                          id: STATE_ID_MAP[stateName],
-                          state: stateName,
-                          value: Math.round(value), 
-                      }
-                    : null;
-            }).filter(Boolean); 
-    
+
+                return {
+                    id: STATE_ID_MAP[stateName],
+                    state: stateName,
+                    value: Math.round(value),
+                };
+            });
+
             setFilteredData(heatmapData);
         }
     }, [selectedDate]);
-    
 
     const gradientData = {
         fromColor: COLOR_RANGE[0],
@@ -126,6 +122,8 @@ function MapSingle() {
         .domain(filteredData.map((d) => d.value))
         .range(COLOR_RANGE);
 
+    const highestCaseValue = Math.max(...filteredData.map((d) => d.value));
+
     const handleDateChange = (e) => {
         setSelectedDate(e.target.value);
     };
@@ -133,16 +131,6 @@ function MapSingle() {
     return (
         <div className="flex flex-col items-center justify-center w-full h-screen px-4">
             <h1 className="text-2xl font-semibold mb-4 mt-4 text-center text-white">Cases by State upto a date</h1>
-            <div className="flex flex-col items-center mb-6">
-                <label htmlFor="date" className="text-white mb-2">Select a Date:</label>
-                <input
-                    type="date"
-                    id="date"
-                    value={selectedDate}
-                    onChange={handleDateChange}
-                    className="px-4 py-2 rounded-md text-black"
-                />
-            </div>
 
             <ReactTooltip>{tooltipContent}</ReactTooltip>
             <ComposableMap
@@ -156,11 +144,12 @@ function MapSingle() {
                     {({ geographies }) =>
                         geographies.map((geo) => {
                             const current = filteredData.find((s) => s.id === geo.id);
+                            const isHotspot = current && current.value === highestCaseValue;
                             return (
                                 <Geography
                                     key={geo.rsmKey}
                                     geography={geo}
-                                    fill={current ? colorScale(current.value) : DEFAULT_COLOR}
+                                    fill={isHotspot ? HOTSPOT_COLOR : (current ? colorScale(current.value) : DEFAULT_COLOR)}
                                     style={geographyStyle}
                                     onMouseEnter={() =>
                                         setHoveredState({ name: current.state, value: current.value })
@@ -194,6 +183,13 @@ function MapSingle() {
                     }}
                 ></div>
                 <span className="text-sm text-white">High</span>
+            </div>
+            <div className="text-white mt-4 flex items-center gap-2">
+                <div
+                    className="w-4 h-4 rounded-full"
+                    style={{ backgroundColor: HOTSPOT_COLOR }}
+                ></div>
+                <span>Hotspot</span>
             </div>
         </div>
     );

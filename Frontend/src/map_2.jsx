@@ -87,20 +87,34 @@ function MapSeven() {
     useEffect(() => {
         const heatmapData = Object.keys(CASES).map((stateName) => {
             const stateData = CASES[stateName];
-            const latestValue = stateData.past[stateData.past.length - 1][1]; 
-
-            
+            if (!stateData.past || !stateData.prediction) {
+                return null; // Skip if past or prediction data is missing
+            }
+    
+            const latestPastValue = stateData.past[stateData.past.length - 1]?.[1];
+            const lastPredictedValue = stateData.prediction[stateData.prediction.length - 1]?.[1];
+    
+            // Handle cases where latestPastValue or lastPredictedValue is undefined
+            if (latestPastValue === undefined || lastPredictedValue === undefined) {
+                return null;
+            }
+    
+            // Calculate percentage difference
+            const percentageDiff = ((latestPastValue - lastPredictedValue) / latestPastValue) * 100;
+    
             const last7Days = stateData.past.slice(-7).map(([date, value]) => ({ date, value }));
-
+    
             return {
-                id: STATE_ID_MAP[stateName], 
+                id: STATE_ID_MAP[stateName],
                 state: stateName,
-                value: latestValue,
-                last7Days, 
+                value: latestPastValue,
+                last7Days,
+                percentageDiff: percentageDiff.toFixed(2),
             };
-        });
+        }).filter(Boolean); // Remove null values
         setData(heatmapData);
     }, []);
+    
 
     const gradientData = {
         fromColor: COLOR_RANGE[0],
@@ -139,6 +153,7 @@ function MapSeven() {
                                             name: current.state,
                                             value: current.value,
                                             last7Days: current.last7Days,
+                                            percentageDiff: current.percentageDiff,
                                         })
                                     }
                                     onMouseLeave={() => setHoveredState(null)}
@@ -153,14 +168,8 @@ function MapSeven() {
                 <div className="bg-white border rounded shadow-md p-3 mt-2 text-base">
                     <strong>{hoveredState.name}</strong>
                     <br />
-                    <strong>Total Cases for the Last 7 Days:</strong>
-                    <ul>
-                        {hoveredState.last7Days.map(({ date, value }) => (
-                            <li key={date}>
-                                {date}: {value}
-                            </li>
-                        ))}
-                    </ul>
+                    <strong>Percentage Difference (Last Past vs. Last Predicted):</strong>{" "}
+                    {hoveredState.percentageDiff}%
                 </div>
             )}
             <div className="flex items-center gap-4 mt-6 mb-4">
