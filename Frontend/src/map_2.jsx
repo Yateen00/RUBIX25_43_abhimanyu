@@ -129,7 +129,7 @@ function MapSeven() {
 
     return (
         <div className="flex flex-col items-center justify-center w-full h-screen px-4">
-            <h1 className="text-2xl font-semibold mb-4 mt-4 text-center text-white">Cases according to States predicted for 7 days</h1>
+            <h1 className="text-2xl font-semibold mb-4 mt-4 text-center text-white">Percentage difference of Cases (Last Past vs Last Predicted) : </h1>
             <ReactTooltip>{tooltipContent}</ReactTooltip>
             <ComposableMap
                 projectionConfig={PROJECTION_CONFIG}
